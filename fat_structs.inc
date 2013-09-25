@@ -58,7 +58,7 @@ struc FAT32_dirent {
 
 struc LFN_dirent {
       .Sequence db ?
-      .P1 db 10 dup (?) ; юникод, чуваки, тут всего 5 симолов
+      .P1 db 10 dup (?) ; СЋРЅРёРєРѕРґ, С‡СѓРІР°РєРё, С‚СѓС‚ РІСЃРµРіРѕ 5 СЃРёРјРѕР»РѕРІ
       .Attribute db ?
       .Reserved db ?
       .Checksum db ?

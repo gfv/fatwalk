@@ -14,8 +14,6 @@ file_not_found db 'File not found: %s', 10, 0
 fmt_fopen_fail db 'fopen() failed :<', 10, 0
 tok_sep db '/', 0
 
-soskok db 'soskok', 10, 0
-
 file_mode db 'rb', 0
 file_write_mode db 'wb', 0
 w_file_write_mode db 'w', 0, 'b', 0, 0, 0

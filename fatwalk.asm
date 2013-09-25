@@ -1,6 +1,6 @@
 format PE console
 entry start
-; обожаю комментарии
+; РѕР±РѕР¶Р°СЋ РєРѕРјРјРµРЅС‚Р°СЂРёРё
 include 'win32a.inc'
 include 'fat_structs.inc'
 
@@ -9,7 +9,7 @@ include 'smartmacro.inc'
 
 section '.text' code executable
 start:
-	; если очень захочется linux, то это можно переписать - слава libc
+	; РµСЃР»Рё РѕС‡РµРЅСЊ Р·Р°С…РѕС‡РµС‚СЃСЏ linux, С‚Рѕ СЌС‚Рѕ РјРѕР¶РЅРѕ РїРµСЂРµРїРёСЃР°С‚СЊ - СЃР»Р°РІР° libc
 	cinvoke __getmainargs, argc, argv, penvdata, pwildcard, pstartinfo
 	cmp [argc], 2
 	jl print_usage
@@ -21,18 +21,18 @@ start:
 	mov esi, [argv]
 	add esi, 4
 
-	; пытаемся открыть файл
+	; РїС‹С‚Р°РµРјСЃСЏ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р»
 	cinvoke fopen, [esi], file_mode
 	test eax, eax
 	jz print_usage
 	mov [fhandle], eax
 
-	; считываем заголовки FAT32
+	; СЃС‡РёС‚С‹РІР°РµРј Р·Р°РіРѕР»РѕРІРєРё FAT32
 	cinvoke fread, bpb_head, bpb_head_size, 1, eax
 	cinvoke fread, bpb32, bpb32_size, 1, [fhandle]
 
 precalculations:
-	; сразу считаем длину кластера, чтобы можно было удобно fseek'ать
+	; СЃСЂР°Р·Сѓ СЃС‡РёС‚Р°РµРј РґР»РёРЅСѓ РєР»Р°СЃС‚РµСЂР°, С‡С‚РѕР±С‹ РјРѕР¶РЅРѕ Р±С‹Р»Рѕ СѓРґРѕР±РЅРѕ fseek'Р°С‚СЊ
 	xor eax, eax
 	xor edx, edx
 	mov ax, [bpb_head.BytesPerSec]
@@ -40,13 +40,13 @@ precalculations:
 	mul dx
 	mov [bytes_per_cluster], eax
 
-	; смещение FAT относительно начала файла
+	; СЃРјРµС‰РµРЅРёРµ FAT РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° С„Р°Р№Р»Р°
 	xor eax, eax
 	mov ax, [bpb_head.RsvdSecCnt]
 	sector_to_offset eax
 	storeq fat_offset
 
-	; смещение кластеров относительно начала файла
+	; СЃРјРµС‰РµРЅРёРµ РєР»Р°СЃС‚РµСЂРѕРІ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° С„Р°Р№Р»Р°
 	xor edx, edx
 	mov dl, [bpb_head.NumFATs]
 	mov eax, [bpb32.FATSz32]
@@ -57,10 +57,10 @@ precalculations:
 	sector_to_offset eax
 	storeq clusters_offset
 
-	; после предыдущих операций, у нас появляются следующие знания
-	;  bytes_per_cluster - байт в кластере
-	;  fat_offset - оффсет начала FAT от начала файла
-	;  clusters_offset - оффсет первого (#2) кластера
+	; РїРѕСЃР»Рµ РїСЂРµРґС‹РґСѓС‰РёС… РѕРїРµСЂР°С†РёР№, Сѓ РЅР°СЃ РїРѕСЏРІР»СЏСЋС‚СЃСЏ СЃР»РµРґСѓСЋС‰РёРµ Р·РЅР°РЅРёСЏ
+	;  bytes_per_cluster - Р±Р°Р№С‚ РІ РєР»Р°СЃС‚РµСЂРµ
+	;  fat_offset - РѕС„С„СЃРµС‚ РЅР°С‡Р°Р»Р° FAT РѕС‚ РЅР°С‡Р°Р»Р° С„Р°Р№Р»Р°
+	;  clusters_offset - РѕС„С„СЃРµС‚ РїРµСЂРІРѕРіРѕ (#2) РєР»Р°СЃС‚РµСЂР°
 
 payload:
 	cmp [argc], 4
@@ -71,7 +71,7 @@ payload:
 
 parse_operation:
 	mov esi, [argv]
-	add esi, 8 ; второй аргумент!
+	add esi, 8 ; РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚!
 	mov esi, [esi] ; fuck logic
 	cmp word [esi], "ls"
 	je ls
@@ -83,8 +83,8 @@ ls:
 	mov eax, [bpb32.RootClus]
 	mov [next_dir], eax
 	mov esi, [argv]
-	add esi, 12 ; третий аргумент!
-	mov esi, [esi] ; argv - это указатель на массив указателей на массивы [символов]. yo dawg
+	add esi, 12 ; С‚СЂРµС‚РёР№ Р°СЂРіСѓРјРµРЅС‚!
+	mov esi, [esi] ; argv - СЌС‚Рѕ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° РјР°СЃСЃРёРІС‹ [СЃРёРјРІРѕР»РѕРІ]. yo dawg
 
 .cd_inside:
 	cinvoke strtok, esi, tok_sep
@@ -103,7 +103,7 @@ ls:
 	xor esi, esi
 	jmp .cd_inside
 
-.no_more_tokens: ; у нас не осталось больше токенов, куда нужно переходить -> мы на месте
+.no_more_tokens: ; Сѓ РЅР°СЃ РЅРµ РѕСЃС‚Р°Р»РѕСЃСЊ Р±РѕР»СЊС€Рµ С‚РѕРєРµРЅРѕРІ, РєСѓРґР° РЅСѓР¶РЅРѕ РїРµСЂРµС…РѕРґРёС‚СЊ -> РјС‹ РЅР° РјРµСЃС‚Рµ
 	stdcall follow_dir, [next_dir], print_sname, print_lfn
 	jmp closef
 
@@ -122,9 +122,9 @@ extract:
 .cd_inside:
 	cinvoke strtok, esi, tok_sep
 	test eax, eax
-	jz .no_more_tokens ; если больше не осталось токенов, то скорее всего, в file_cluster - кластер файла
+	jz .no_more_tokens ; РµСЃР»Рё Р±РѕР»СЊС€Рµ РЅРµ РѕСЃС‚Р°Р»РѕСЃСЊ С‚РѕРєРµРЅРѕРІ, С‚Рѕ СЃРєРѕСЂРµРµ РІСЃРµРіРѕ, РІ file_cluster - РєР»Р°СЃС‚РµСЂ С„Р°Р№Р»Р°
 	
-	test [next_dir], -1 ; если все еще остались токены, а директории кончились, то мы файл так и не нашли
+	test [next_dir], -1 ; РµСЃР»Рё РІСЃРµ РµС‰Рµ РѕСЃС‚Р°Р»РёСЃСЊ С‚РѕРєРµРЅС‹, Р° РґРёСЂРµРєС‚РѕСЂРёРё РєРѕРЅС‡РёР»РёСЃСЊ, С‚Рѕ РјС‹ С„Р°Р№Р» С‚Р°Рє Рё РЅРµ РЅР°С€Р»Рё
 	jz .not_found
 	
 	mov ebx, eax
@@ -136,16 +136,16 @@ extract:
 	
 	stdcall follow_dir, eax, ex_short_callback, ex_long_callback
 	pop ebx
-	cmp [next_dir], -1 ; если next_dir не изменилось, то мы просто не нашли файла с таким именем
-	je .not_found ; если бы нашли директорию - там был бы ее кластер, если бы файл - 0
+	cmp [next_dir], -1 ; РµСЃР»Рё next_dir РЅРµ РёР·РјРµРЅРёР»РѕСЃСЊ, С‚Рѕ РјС‹ РїСЂРѕСЃС‚Рѕ РЅРµ РЅР°С€Р»Рё С„Р°Р№Р»Р° СЃ С‚Р°РєРёРј РёРјРµРЅРµРј
+	je .not_found ; РµСЃР»Рё Р±С‹ РЅР°С€Р»Рё РґРёСЂРµРєС‚РѕСЂРёСЋ - С‚Р°Рј Р±С‹Р» Р±С‹ РµРµ РєР»Р°СЃС‚РµСЂ, РµСЃР»Рё Р±С‹ С„Р°Р№Р» - 0
 	
 	xor esi, esi
 	jmp .cd_inside
 
-.no_more_tokens: ; у нас не осталось больше токенов, куда нужно переходить -> мы на месте
+.no_more_tokens: ; Сѓ РЅР°СЃ РЅРµ РѕСЃС‚Р°Р»РѕСЃСЊ Р±РѕР»СЊС€Рµ С‚РѕРєРµРЅРѕРІ, РєСѓРґР° РЅСѓР¶РЅРѕ РїРµСЂРµС…РѕРґРёС‚СЊ -> РјС‹ РЅР° РјРµСЃС‚Рµ
 	test [file_cluster], -1
 	jz .not_found
-	; ага! мы нашли файл кластера.
+	; Р°РіР°! РјС‹ РЅР°С€Р»Рё С„Р°Р№Р» РєР»Р°СЃС‚РµСЂР°.
 	cinvoke _wfopen, lookup_mb_buffer, w_file_write_mode
 	test eax, eax
 	push eax
@@ -164,12 +164,12 @@ extract:
 	cinvoke printf, fmt_fopen_fail
 	jmp closef
 
-; нас неправильно вызвали
+; РЅР°СЃ РЅРµРїСЂР°РІРёР»СЊРЅРѕ РІС‹Р·РІР°Р»Рё
 print_usage:
 	cinvoke printf, usage
 	jmp halt
 
-; обработка ошибок: чем раньше мы наткнемся на ошибку, тем меньше действий надо совершить
+; РѕР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РѕРє: С‡РµРј СЂР°РЅСЊС€Рµ РјС‹ РЅР°С‚РєРЅРµРјСЃСЏ РЅР° РѕС€РёР±РєСѓ, С‚РµРј РјРµРЅСЊС€Рµ РґРµР№СЃС‚РІРёР№ РЅР°РґРѕ СЃРѕРІРµСЂС€РёС‚СЊ
 closef: cinvoke fclose, [fhandle]
 halt:	invoke ExitProcess, 0
 
@@ -342,44 +342,44 @@ proc print_lfn, rec:DWORD, lfn:DWORD
 	endp
 
 ;
-; а теперь пошли процедуры
+; Р° С‚РµРїРµСЂСЊ РїРѕС€Р»Рё РїСЂРѕС†РµРґСѓСЂС‹
 ;
 
-; Итерироваться по директории.
-; cluster - первый кластер директории
-; short_callback - коллбэк при нахождении файла с коротким именем. должен быть stdcall и
-;                  принимать ровно один dword - указатель на запись директории и файле.
-; lfn_callback - коллбэк при нахождении файла с длинным именем. должен быть stdcall и принимать
-;                два параметра: указатель на запись директории и указатель на начало названия.
-; побочные эффекты: все, что попало
+; РС‚РµСЂРёСЂРѕРІР°С‚СЊСЃСЏ РїРѕ РґРёСЂРµРєС‚РѕСЂРёРё.
+; cluster - РїРµСЂРІС‹Р№ РєР»Р°СЃС‚РµСЂ РґРёСЂРµРєС‚РѕСЂРёРё
+; short_callback - РєРѕР»Р»Р±СЌРє РїСЂРё РЅР°С…РѕР¶РґРµРЅРёРё С„Р°Р№Р»Р° СЃ РєРѕСЂРѕС‚РєРёРј РёРјРµРЅРµРј. РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ stdcall Рё
+;                  РїСЂРёРЅРёРјР°С‚СЊ СЂРѕРІРЅРѕ РѕРґРёРЅ dword - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р·Р°РїРёСЃСЊ РґРёСЂРµРєС‚РѕСЂРёРё Рё С„Р°Р№Р»Рµ.
+; lfn_callback - РєРѕР»Р»Р±СЌРє РїСЂРё РЅР°С…РѕР¶РґРµРЅРёРё С„Р°Р№Р»Р° СЃ РґР»РёРЅРЅС‹Рј РёРјРµРЅРµРј. РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ stdcall Рё РїСЂРёРЅРёРјР°С‚СЊ
+;                РґРІР° РїР°СЂР°РјРµС‚СЂР°: СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р·Р°РїРёСЃСЊ РґРёСЂРµРєС‚РѕСЂРёРё Рё СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»Рѕ РЅР°Р·РІР°РЅРёСЏ.
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: РІСЃРµ, С‡С‚Рѕ РїРѕРїР°Р»Рѕ
 proc follow_dir, cluster:DWORD, short_callback:DWORD, lfn_callback:DWORD
 	mov eax, [cluster]
 	push eax
 	call read_cluster
 .init_counters:
-	; esi - указатель на текущую запись
-	; ebx - сколько максимально осталось записей в кластере
+	; esi - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РµРєСѓС‰СѓСЋ Р·Р°РїРёСЃСЊ
+	; ebx - СЃРєРѕР»СЊРєРѕ РјР°РєСЃРёРјР°Р»СЊРЅРѕ РѕСЃС‚Р°Р»РѕСЃСЊ Р·Р°РїРёСЃРµР№ РІ РєР»Р°СЃС‚РµСЂРµ
 	mov esi, cluster_buffer
 	mov edi, lfn_buffer_end
 	mov byte [edi], 0
 	mov ebx, [bytes_per_cluster]
-	shr ebx, 5 ; каждая запись по 32 байта
+	shr ebx, 5 ; РєР°Р¶РґР°СЏ Р·Р°РїРёСЃСЊ РїРѕ 32 Р±Р°Р№С‚Р°
 .parse_entry:
 	virtual at esi
 	  .dirent FAT32_dirent
 	end virtual
-	; если первый байт названия = 0x00 -> все кончилось
+	; РµСЃР»Рё РїРµСЂРІС‹Р№ Р±Р°Р№С‚ РЅР°Р·РІР°РЅРёСЏ = 0x00 -> РІСЃРµ РєРѕРЅС‡РёР»РѕСЃСЊ
 	test [.dirent.Name], 0xff
 	jz .no_more_records
-	; если в атрибуте файла RO|HID|SYS|VL - это LFN
+	; РµСЃР»Рё РІ Р°С‚СЂРёР±СѓС‚Рµ С„Р°Р№Р»Р° RO|HID|SYS|VL - СЌС‚Рѕ LFN
 	cmp [.dirent.Attribute], 0x0f
 	jne .process_alias
 	call lfn_record
 	jmp .next_entry
 
-; если мы дошли сюда, то перед нами alias, и его можно обработать
-; что на входе: edi с адресом первого байта в LFN, lfn_buffer с корректной строкой 
-; побочные эффекты: eax, ecx, edx, edi
+; РµСЃР»Рё РјС‹ РґРѕС€Р»Рё СЃСЋРґР°, С‚Рѕ РїРµСЂРµРґ РЅР°РјРё alias, Рё РµРіРѕ РјРѕР¶РЅРѕ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ
+; С‡С‚Рѕ РЅР° РІС…РѕРґРµ: edi СЃ Р°РґСЂРµСЃРѕРј РїРµСЂРІРѕРіРѕ Р±Р°Р№С‚Р° РІ LFN, lfn_buffer СЃ РєРѕСЂСЂРµРєС‚РЅРѕР№ СЃС‚СЂРѕРєРѕР№ 
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: eax, ecx, edx, edi
 .process_alias:
 	cmp edi, lfn_buffer_end 
 	jz .process_83
@@ -391,10 +391,10 @@ proc follow_dir, cluster:DWORD, short_callback:DWORD, lfn_callback:DWORD
 	mov edi, lfn_buffer_end
 	jmp .next_entry
 
-; это не LFN, а вполне себе короткое имя. печатаем его, польуясь тем, что оно хранится
-; в первых 11 байтах записи.
-; что на входе: esi с адресом начала записи директории
-; побочные эффекты: eax, ecx, edx
+; СЌС‚Рѕ РЅРµ LFN, Р° РІРїРѕР»РЅРµ СЃРµР±Рµ РєРѕСЂРѕС‚РєРѕРµ РёРјСЏ. РїРµС‡Р°С‚Р°РµРј РµРіРѕ, РїРѕР»СЊСѓСЏСЃСЊ С‚РµРј, С‡С‚Рѕ РѕРЅРѕ С…СЂР°РЅРёС‚СЃСЏ
+; РІ РїРµСЂРІС‹С… 11 Р±Р°Р№С‚Р°С… Р·Р°РїРёСЃРё.
+; С‡С‚Рѕ РЅР° РІС…РѕРґРµ: esi СЃ Р°РґСЂРµСЃРѕРј РЅР°С‡Р°Р»Р° Р·Р°РїРёСЃРё РґРёСЂРµРєС‚РѕСЂРёРё
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: eax, ecx, edx
 .process_83:
 	mov eax, [short_callback]
 	stdcall eax, esi
@@ -402,19 +402,19 @@ proc follow_dir, cluster:DWORD, short_callback:DWORD, lfn_callback:DWORD
 	jz .no_more_records
    ;jmp .next_entry
 
-; с этой записью все, нужно перейти дальше и повторить
-; на входе: esi с адресом записи, ebx с количеством оставшихся 
-; на выходе: esi с адресом следующей, ebx с количеством оставшихся
+; СЃ СЌС‚РѕР№ Р·Р°РїРёСЃСЊСЋ РІСЃРµ, РЅСѓР¶РЅРѕ РїРµСЂРµР№С‚Рё РґР°Р»СЊС€Рµ Рё РїРѕРІС‚РѕСЂРёС‚СЊ
+; РЅР° РІС…РѕРґРµ: esi СЃ Р°РґСЂРµСЃРѕРј Р·Р°РїРёСЃРё, ebx СЃ РєРѕР»РёС‡РµСЃС‚РІРѕРј РѕСЃС‚Р°РІС€РёС…СЃСЏ 
+; РЅР° РІС‹С…РѕРґРµ: esi СЃ Р°РґСЂРµСЃРѕРј СЃР»РµРґСѓСЋС‰РµР№, ebx СЃ РєРѕР»РёС‡РµСЃС‚РІРѕРј РѕСЃС‚Р°РІС€РёС…СЃСЏ
 .next_entry:
-	; смещаемся на длину записи
+	; СЃРјРµС‰Р°РµРјСЃСЏ РЅР° РґР»РёРЅСѓ Р·Р°РїРёСЃРё
 	add esi, 32
 	dec ebx
 	jnz .parse_entry
 
-; в этом кластере записи кончились, нужно прочитать следующий кластер
-; на вершине стека лежит номер кластера, который мы только что читали.
-; снимаем его, читаем следующий за ним и кладем его номер в стек
-; побочные эффекты: eax, ecx, edx, вершина стека
+; РІ СЌС‚РѕРј РєР»Р°СЃС‚РµСЂРµ Р·Р°РїРёСЃРё РєРѕРЅС‡РёР»РёСЃСЊ, РЅСѓР¶РЅРѕ РїСЂРѕС‡РёС‚Р°С‚СЊ СЃР»РµРґСѓСЋС‰РёР№ РєР»Р°СЃС‚РµСЂ
+; РЅР° РІРµСЂС€РёРЅРµ СЃС‚РµРєР° Р»РµР¶РёС‚ РЅРѕРјРµСЂ РєР»Р°СЃС‚РµСЂР°, РєРѕС‚РѕСЂС‹Р№ РјС‹ С‚РѕР»СЊРєРѕ С‡С‚Рѕ С‡РёС‚Р°Р»Рё.
+; СЃРЅРёРјР°РµРј РµРіРѕ, С‡РёС‚Р°РµРј СЃР»РµРґСѓСЋС‰РёР№ Р·Р° РЅРёРј Рё РєР»Р°РґРµРј РµРіРѕ РЅРѕРјРµСЂ РІ СЃС‚РµРє
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: eax, ecx, edx, РІРµСЂС€РёРЅР° СЃС‚РµРєР°
 .next_cluster:
 	pop eax
 	call read_next_cluster
@@ -451,11 +451,11 @@ proc dump_cluster_chain, zero_cluster:DWORD, len:DWORD, fouthandle:DWORD
 ; here be dragons
 ;
 
-; функция, которая принимает указатель на запись внутри cluster_buffer в esi
-; и дописывает фрагмент LFN по нему в начало lfn_buffer. после этого она перемещает
-; edi в начало записанных данных и возвращается.
-; требуется: edi, указывающий на начало предыдущей записи в буфере LFN
-; побочные эффекты: ecx, edi, [lfn_buffer]
+; С„СѓРЅРєС†РёСЏ, РєРѕС‚РѕСЂР°СЏ РїСЂРёРЅРёРјР°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° Р·Р°РїРёСЃСЊ РІРЅСѓС‚СЂРё cluster_buffer РІ esi
+; Рё РґРѕРїРёСЃС‹РІР°РµС‚ С„СЂР°РіРјРµРЅС‚ LFN РїРѕ РЅРµРјСѓ РІ РЅР°С‡Р°Р»Рѕ lfn_buffer. РїРѕСЃР»Рµ СЌС‚РѕРіРѕ РѕРЅР° РїРµСЂРµРјРµС‰Р°РµС‚
+; edi РІ РЅР°С‡Р°Р»Рѕ Р·Р°РїРёСЃР°РЅРЅС‹С… РґР°РЅРЅС‹С… Рё РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ.
+; С‚СЂРµР±СѓРµС‚СЃСЏ: edi, СѓРєР°Р·С‹РІР°СЋС‰РёР№ РЅР° РЅР°С‡Р°Р»Рѕ РїСЂРµРґС‹РґСѓС‰РµР№ Р·Р°РїРёСЃРё РІ Р±СѓС„РµСЂРµ LFN
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: ecx, edi, [lfn_buffer]
 proc lfn_record
 	virtual at ebx
 	  .lfnent LFN_dirent
@@ -468,7 +468,7 @@ proc lfn_record
 	sub edi, 26
 	push esi
 
-; fasm'у что-то не нравится в записях LFN, так что макрос из lea и смещений
+; fasm'Сѓ С‡С‚Рѕ-С‚Рѕ РЅРµ РЅСЂР°РІРёС‚СЃСЏ РІ Р·Р°РїРёСЃСЏС… LFN, С‚Р°Рє С‡С‚Рѕ РјР°РєСЂРѕСЃ РёР· lea Рё СЃРјРµС‰РµРЅРёР№
 macro esi_load_with_ebx_offset off, len
 {
 	lea esi, [ebx+off]
@@ -493,10 +493,10 @@ macro esi_load_with_ebx_offset off, len
 	ret
 	endp
 
-; попробовать прочитать кластер, следующий за #eax
-; CF=0 -> прочитано, в буфере
-; CF=1 -> это был последний кластер в цепочке
-; побочные эффекты: eax, ecx, edx, dword_buffer, cluster_buffer 
+; РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РїСЂРѕС‡РёС‚Р°С‚СЊ РєР»Р°СЃС‚РµСЂ, СЃР»РµРґСѓСЋС‰РёР№ Р·Р° #eax
+; CF=0 -> РїСЂРѕС‡РёС‚Р°РЅРѕ, РІ Р±СѓС„РµСЂРµ
+; CF=1 -> СЌС‚Рѕ Р±С‹Р» РїРѕСЃР»РµРґРЅРёР№ РєР»Р°СЃС‚РµСЂ РІ С†РµРїРѕС‡РєРµ
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: eax, ecx, edx, dword_buffer, cluster_buffer 
 proc read_next_cluster
 	xor edx, edx
 	shl eax, 2
@@ -516,7 +516,7 @@ proc read_next_cluster
 	ret
 	endp
 
-; hexdump len байт по адресу ad
+; hexdump len Р±Р°Р№С‚ РїРѕ Р°РґСЂРµСЃСѓ ad
 proc hexdump, ad:DWORD, len:DWORD
 	push esi
 	push ebx
@@ -541,21 +541,21 @@ proc hexdump, ad:DWORD, len:DWORD
 	ret
 	endp
 
-; перейти к байту по адресу edx:eax.
-; libc-dependent: для длинных файлов будет нужен соответствующий 64-битный fseek
-; побочные эффекты: eax, ecx, edx
+; РїРµСЂРµР№С‚Рё Рє Р±Р°Р№С‚Сѓ РїРѕ Р°РґСЂРµСЃСѓ edx:eax.
+; libc-dependent: РґР»СЏ РґР»РёРЅРЅС‹С… С„Р°Р№Р»РѕРІ Р±СѓРґРµС‚ РЅСѓР¶РµРЅ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ 64-Р±РёС‚РЅС‹Р№ fseek
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: eax, ecx, edx
 proc long_fseek
 	push 0
-	push edx ; для вызова функции с аргументом в __int64 сначала push старший dword
-	push eax ; потом младший
+	push edx ; РґР»СЏ РІС‹Р·РѕРІР° С„СѓРЅРєС†РёРё СЃ Р°СЂРіСѓРјРµРЅС‚РѕРј РІ __int64 СЃРЅР°С‡Р°Р»Р° push СЃС‚Р°СЂС€РёР№ dword
+	push eax ; РїРѕС‚РѕРј РјР»Р°РґС€РёР№
 	push [fhandle]
 	call [fseeki64]
 	add esp, 16
 	ret
 	endp
 
-; прочитать dword по оффсету из edx:eax
-; побочные эффекты: eax, ecx, edx, меняется dword_buffer
+; РїСЂРѕС‡РёС‚Р°С‚СЊ dword РїРѕ РѕС„С„СЃРµС‚Сѓ РёР· edx:eax
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: eax, ecx, edx, РјРµРЅСЏРµС‚СЃСЏ dword_buffer
 proc read_dword
 	call long_fseek
 	cinvoke fread, dword_buffer, 4, 1, [fhandle]
@@ -563,8 +563,8 @@ proc read_dword
 	ret
 	endp
 
-; прочитать кластер с номером eax
-; побочные эффекты: eax, ecx, edx, dword_buffer, cluster_buffer
+; РїСЂРѕС‡РёС‚Р°С‚СЊ РєР»Р°СЃС‚РµСЂ СЃ РЅРѕРјРµСЂРѕРј eax
+; РїРѕР±РѕС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹: eax, ecx, edx, dword_buffer, cluster_buffer
 proc read_cluster
 	sub eax, 2
 	xor edx, edx
@@ -581,7 +581,7 @@ proc read_cluster
 
 
 proc flush_multibyte_buffer
-	int 3 ; тест
+	;; int 3                   ; С‚РµСЃС‚
 	push ecx
 	push edi
 	xor eax, eax
@@ -594,7 +594,7 @@ proc flush_multibyte_buffer
 	endp
 
 
-; превратить имя файла 8.3 в LFN-подобный Юникод.
+; РїСЂРµРІСЂР°С‚РёС‚СЊ РёРјСЏ С„Р°Р№Р»Р° 8.3 РІ LFN-РїРѕРґРѕР±РЅС‹Р№ Р®РЅРёРєРѕРґ.
 proc convert_short_filename, short_name:DWORD
 	push esi
 	push edi
@@ -609,17 +609,17 @@ proc convert_short_filename, short_name:DWORD
 	cmp al, ' '
 	je .find_last_letter
 
-	inc ecx ; длина названия файла
+	inc ecx ; РґР»РёРЅР° РЅР°Р·РІР°РЅРёСЏ С„Р°Р№Р»Р°
 	mov esi, [short_name]
 	cld
 	mov edi, short_name_buffer
 	rep movsb
 	mov byte [edi], '.'
-	inc edi ; указатель на символ за точкой
+	inc edi ; СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃРёРјРІРѕР» Р·Р° С‚РѕС‡РєРѕР№
 	
 	mov ecx, 3
 	mov esi, [short_name]
-	add esi, 8 ; указатель на расширение
+	add esi, 8 ; СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЂР°СЃС€РёСЂРµРЅРёРµ
 
 .store_extension:
 	lodsb
@@ -638,7 +638,7 @@ proc convert_short_filename, short_name:DWORD
 	ret
 	endp
 
-; превратить имя директории в LFN. Не проставляет точку, в отличие от convert_short_filename
+; РїСЂРµРІСЂР°С‚РёС‚СЊ РёРјСЏ РґРёСЂРµРєС‚РѕСЂРёРё РІ LFN. РќРµ РїСЂРѕСЃС‚Р°РІР»СЏРµС‚ С‚РѕС‡РєСѓ, РІ РѕС‚Р»РёС‡РёРµ РѕС‚ convert_short_filename
 proc convert_short_directory_name, short_name:DWORD
 	push esi ; it's a freakin' local variable, mate
 	mov esi, [short_name]
@@ -647,7 +647,7 @@ proc convert_short_directory_name, short_name:DWORD
 	std
 .find_last_letter:
 	dec ecx
-	jz .empty ; на практике не должно случиться
+	jz .empty ; РЅР° РїСЂР°РєС‚РёРєРµ РЅРµ РґРѕР»Р¶РЅРѕ СЃР»СѓС‡РёС‚СЊСЃСЏ
 	lodsb
 	cmp al, ' '
 	je .find_last_letter
@@ -659,7 +659,7 @@ proc convert_short_directory_name, short_name:DWORD
 	rep movsb
 	sub edi, short_name_buffer
 	invoke MultiByteToWideChar, CP_ACP, 0, short_name_buffer, edi, multibyte_buffer, 512
-	mov eax, edi ; вернем длину названия директории
+	mov eax, edi ; РІРµСЂРЅРµРј РґР»РёРЅСѓ РЅР°Р·РІР°РЅРёСЏ РґРёСЂРµРєС‚РѕСЂРёРё
 
 .empty:
 	pop esi
